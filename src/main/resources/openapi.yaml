@@ -1,0 +1,295 @@
+openapi: 3.0.3
+info:
+  title: Social Microservice Api
+  description: Description
+  version: 1.0.0
+
+tags:
+  - name: chat
+  - name: feed
+  - name: posts
+  - name: comments
+  - name: reaction
+  - name: connections
+
+servers:
+  - url: 'https://test.com/service/social'
+    description: Production server (uses live data)
+
+paths:
+  '/feed/{userId}':
+    parameters:
+      - schema:
+          type: string
+        name: userId
+        in: path
+        required: true
+    get:
+      summary: Get the all posts of the specified user
+      tags:
+        - feed
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedDto'
+      operationId: get-feed
+  /feed/friends:
+    parameters: [ ]
+    get:
+      summary: Get all posts of the current user's friends and followers
+      tags:
+        - feed
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedDto'
+      description: ''
+  /friends:
+    parameters: [ ]
+    get:
+      summary: Get current user's friends
+      tags:
+        - connections
+      responses:
+        '200':
+          description: Returns the names of the current user's friends
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+    post:
+      summary: Add a friend to the current user
+      tags:
+        - connections
+      responses:
+        '200':
+          description: Desc
+
+  /posts:
+    put:
+      summary: ''
+      tags:
+        - posts
+      operationId: put-posts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponseDto'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequestDto'
+        description: ''
+      description: ''
+  /posts/{postId}:
+    parameters:
+      - schema:
+          type: string
+        name: postId
+        in: path
+        required: true
+        description: id of the post
+    delete:
+      summary: 'Deletes specified post'
+      tags:
+        - posts
+      operationId: delete-posts-postId
+      responses:
+        '200':
+          description: OK
+  /comments:
+    put:
+      summary: ''
+      tags:
+        - comments
+      operationId: put-comments
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponseDto'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequestDto'
+  '/comments/{commentId}':
+    parameters:
+      - schema:
+          type: string
+        name: commentId
+        in: path
+        required: true
+    delete:
+      summary: ''
+      tags:
+        - comments
+      operationId: delete-comments-commentId
+      responses:
+        '200':
+          description: OK
+  /reactions:
+    put:
+      summary: 'Adds a reaction of the given type to the specified item'
+      tags:
+        - reactions
+      operationId: put-reactions
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReactionDto'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReactionDto'
+        description: ''
+  '/reactions/{reactionId}':
+    parameters:
+      - schema:
+          type: string
+        name: reactionId
+        in: path
+        required: true
+    delete:
+      summary: ''
+      tags:
+        - reactions
+      operationId: delete-reactions-reactionId
+      responses:
+        '200':
+          description: OK
+
+components:
+  schemas:
+    FeedDto:
+      title: FeedDto
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostResponseDto'
+    PostRequestDto:
+      title: PostRequestDto
+      type: object
+      properties:
+        createdBy:
+          type: string
+        content:
+          type: string
+        isPrivate:
+          type: boolean
+        tagedUserIds:
+          type: array
+          items:
+            type: string
+    PostResponseDto:
+      description: The Post with all likes and comments
+      type: object
+      title: PostResponseDto
+      properties:
+        postId:
+          type: string
+        createdBy:
+          type: string
+        content:
+          type: string
+        timestamp: { }
+        isPrivate:
+          type: boolean
+        tagedUserIds:
+          type: array
+          items:
+            type: string
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentResponseDto'
+        reactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReactionDto'
+    CommentRequestDto:
+      title: CommentRequestDto
+      type: object
+      properties:
+        userId:
+          type: string
+        parentId:
+          type: string
+        content:
+          type: string
+    CommentResponseDto:
+      title: CommentResponseDto
+      type: object
+      properties:
+        commentId:
+          type: string
+        userId:
+          type: string
+        parentId:
+          type: string
+        content:
+          type: string
+        reactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReactionDto'
+    ReactionDto:
+      title: ReactionDto
+      type: object
+      properties:
+        userId:
+          type: string
+        parentId:
+          type: string
+        parentType:
+          type: string
+        reactionType:
+          type: string
+          enum:
+            - like
+            - love
+            - haha
+            - wow
+            - sad
+            - angry
+    UserDto:
+      title: User
+      type: object
+      properties:
+        userId:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        userType:
+          type: string
+          enum:
+            - follower
+            - friend
+    UsersDto:
+      title: UsersDto
+      type: object
+      properties:
+        users:
+          type: object
+          items:
+            $ref: '#/components/schemas/UserDto'
