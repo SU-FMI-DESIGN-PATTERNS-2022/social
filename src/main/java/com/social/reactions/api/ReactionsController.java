@@ -3,7 +3,11 @@ package com.social.reactions.api;
 import com.social.api.ReactionsApi;
 import com.social.model.ReactionDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
+@RequestMapping("/")
 public class ReactionsController implements ReactionsApi {
 
   @Override

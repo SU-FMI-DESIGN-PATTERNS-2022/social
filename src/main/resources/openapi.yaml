@@ -13,7 +13,7 @@ tags:
   - name: connections
 
 servers:
-  - url: 'https://test.com/service/social'
+  - url: 'localhost:8080/service/social'
     description: Production server (uses live data)
 
 paths:
@@ -36,7 +36,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FeedDto'
       operationId: get-feed
-  /feed/friends:
+  /feed:
     parameters: [ ]
     get:
       summary: Get all posts of the current user's friends and followers
