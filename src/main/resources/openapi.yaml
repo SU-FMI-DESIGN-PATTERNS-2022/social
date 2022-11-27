@@ -108,23 +108,19 @@ paths:
         '200':
           description: OK
   /comments:
-    put:
+    post:
       summary: ''
       tags:
         - comments
-      operationId: put-comments
+      operationId: post-comments
       responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CommentResponseDto'
+        '201':
+          description: Created
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CommentRequestDto'
+              $ref: '#/components/schemas/CommentPostDto'
   '/comments/{commentId}':
     parameters:
       - schema:
@@ -132,6 +128,18 @@ paths:
         name: commentId
         in: path
         required: true
+    patch:
+      summary: 'Update the content of a post'
+      tags:
+        - comments
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentPatchDto'
     delete:
       summary: ''
       tags:
@@ -225,14 +233,20 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ReactionDto'
-    CommentRequestDto:
-      title: CommentRequestDto
+    CommentPostDto:
+      title: CommentPostDto
       type: object
       properties:
-        userId:
-          type: string
         parentId:
           type: string
+        content:
+          type: string
+        parentType:
+          $ref: '#/components/schemas/ParentType'
+    CommentPatchDto:
+      title: CommentPatchDto
+      type: object
+      properties:
         content:
           type: string
     CommentResponseDto:
@@ -242,8 +256,6 @@ components:
         commentId:
           type: string
         userId:
-          type: string
-        parentId:
           type: string
         content:
           type: string
@@ -293,3 +305,10 @@ components:
           type: object
           items:
             $ref: '#/components/schemas/UserDto'
+    ParentType:
+      title: ParentType
+      type: string
+      enum:
+        - comment
+        - post
+        - news
