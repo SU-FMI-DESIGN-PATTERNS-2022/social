@@ -21,7 +21,7 @@ public class CommentsService {
   }
 
   public void deleteComment(String commentId, String userId) {
-    commentsRepository.deleteByIdAndUserId(commentId, userId);
+    commentsRepository.updateContentAndContentTypeByIdAndUserId(commentId, userId, "", CommentContentType.DELETED);
   }
 
   public void updateCommentContent(String commentId, String userId, String content, CommentContentType contentType) {

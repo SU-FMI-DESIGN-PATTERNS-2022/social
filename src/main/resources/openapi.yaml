@@ -237,18 +237,32 @@ components:
       title: CommentPostDto
       type: object
       properties:
-        parentId:
+        parentComment:
           type: string
         content:
           type: string
+        parent:
+          type: string
         parentType:
           $ref: '#/components/schemas/ParentType'
+        contentType:
+          $ref: '#/components/schemas/ContentType'
+      required:
+        - parent
+        - content
+        - parentType
+        - contentType
     CommentPatchDto:
       title: CommentPatchDto
       type: object
       properties:
         content:
           type: string
+        contentType:
+          $ref: '#/components/schemas/ContentType'
+      required:
+        - content
+        - contentType
     CommentResponseDto:
       title: CommentResponseDto
       type: object
@@ -309,6 +323,12 @@ components:
       title: ParentType
       type: string
       enum:
-        - comment
         - post
         - news
+    ContentType:
+      title: ContentType
+      type: string
+      enum:
+        - text
+        - gif
+        - image

@@ -26,7 +26,7 @@ public class CommentsController implements CommentsApi {
   public ResponseEntity<Void> commentsCommentIdPatch(String commentId, CommentPatchDto commentPatchDto) {
     String userId = "JFDOJ";
     String content = commentPatchDto.getContent();
-    CommentContentType contentType = getContentType(content);
+    CommentContentType contentType = CommentContentType.valueOf(commentPatchDto.getContentType().toString());
     commentsService.updateCommentContent(commentId, userId, content, contentType);
     return new ResponseEntity<>(HttpStatus.OK);
   }
@@ -41,38 +41,21 @@ public class CommentsController implements CommentsApi {
   @Override
   public ResponseEntity<Void> postComments(CommentPostDto commentPostDto) {
     Comment comment = commentPostDtoToComment(commentPostDto);
-    if (!doesParentExist(comment.getParentId(), comment.getParentType())) {
+    if (!commentsService.doesCommentExist(comment.getParentComment())) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+    //TODO: Check if parent exists
     commentsService.createComment(comment);
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
-  private boolean doesParentExist(String parentId, ParentType parentType) {
-    switch (parentType) {
-      case COMMENT -> {
-        return commentsService.doesCommentExist(parentId);
-      }
-      case POST -> {
-        return true;
-      }
-      case NEWS -> {
-        return true;
-      }
-    }
-    return false;
-  }
-
   private Comment commentPostDtoToComment(CommentPostDto commentPostDto) {
     String userId = "JFDOJ";
-    String parentId = commentPostDto.getParentId();
+    String parentPost = commentPostDto.getParent();
     String content = commentPostDto.getContent();
-    CommentContentType contentType = getContentType(content);
+    CommentContentType contentType = CommentContentType.valueOf(commentPostDto.getContentType().toString());
+    String parentComment = commentPostDto.getParentComment();
     ParentType parentType = commentPostDto.getParentType();
-    return new Comment(userId, parentId, content, contentType, parentType);
-  }
-
-  private CommentContentType getContentType(String content) {
-    return CommentContentType.TEXT;
+    return new Comment(userId, parentPost, content, contentType, parentComment, parentType);
   }
 }

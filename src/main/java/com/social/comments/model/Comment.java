@@ -19,25 +19,27 @@ public class Comment {
   private String id;
   @Column(name = "user_id")
   private String userId;
-  @Column(name = "parent_id")
-  private String parentId;
+  @Column(name = "parent")
+  private String parent;
   @Column(name = "content")
   private String content;
   @Column(name = "content_type")
   private CommentContentType contentType;
-  @Column(name = "parent_type")
-  private ParentType parentType;
+  @Column(name = "parent_comment")
+  private String parentComment;
 
+  @Column(name="parent_type")
+  private ParentType parentType;
   public Comment() {
 
   }
 
-  public Comment(String userId, String parentId, String content, CommentContentType contentType, ParentType parentType) {
+  public Comment(String userId,String parent, String content, CommentContentType contentType, String parentComment, ParentType parentType) {
     this.userId = userId;
-    this.parentId = parentId;
+    this.parent = parent;
     this.content = content;
     this.contentType = contentType;
-    this.parentType = parentType;
+    this.parentComment = parentComment;
   }
 
   public void setId(String id) {
@@ -52,10 +54,6 @@ public class Comment {
     return userId;
   }
 
-  public String getParentId() {
-    return parentId;
-  }
-
   public String getContent() {
     return content;
   }
@@ -64,7 +62,11 @@ public class Comment {
     return contentType;
   }
 
-  public ParentType getParentType() {
-    return parentType;
+  public String getParentPost() {
+    return parent;
+  }
+
+  public String getParentComment() {
+    return parentComment;
   }
 }
