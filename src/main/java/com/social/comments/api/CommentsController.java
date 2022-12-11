@@ -34,7 +34,7 @@ public class CommentsController implements CommentsApi {
   @Override
   public ResponseEntity<Void> deleteCommentsCommentId(String commentId) {
     String userId = "JFDOJ";
-    commentsService.deleteComment(commentId, userId);
+    commentsService.deleteCommentContent(commentId, userId);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

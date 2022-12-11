@@ -72,38 +72,49 @@ paths:
           description: Desc
 
   /posts:
-    put:
-      summary: ''
-      tags:
-        - posts
-      operationId: put-posts
-      responses:
-        '200':
-          description: OK
+    post:
+        summary: 'Create a new post from the current user'
+        tags:
+          - posts
+        operationId: post-post
+        requestBody:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PostResponseDto'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PostRequestDto'
-        description: ''
-      description: ''
+                $ref: '#/components/schemas/PostPostDto'
+          description: ''
+        responses:
+          '201':
+            description: A new post has been created
   /posts/{postId}:
     parameters:
       - schema:
           type: string
+          format: uuid
         name: postId
         in: path
         required: true
         description: id of the post
+    patch:
+      summary: "Update a post's content"
+      tags:
+        - posts
+      operationId: patch-post
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostPatchDto'
+        description: ''
+      description: ''
     delete:
       summary: 'Deletes specified post'
       tags:
         - posts
-      operationId: delete-posts-postId
+      operationId: delete-post
       responses:
         '200':
           description: OK
@@ -193,38 +204,60 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PostResponseDto'
-    PostRequestDto:
+    PostPostDto:
       title: PostRequestDto
       type: object
       properties:
         createdBy:
           type: string
+          format: uuid
         content:
           type: string
+        contentType:
+          $ref: '#/components/schemas/PostContentTypeDto'
         isPrivate:
           type: boolean
-        tagedUserIds:
+        taggedUsers:
           type: array
+          default: []
           items:
             type: string
+            format: uuid
+      required:
+        - createdBy
+        - content
+        - contentType
+        - isPrivate
+    PostPatchDto:
+      type: object
+      title: PostPatchDto
+      properties:
+        content:
+          type: string
+        contentType:
+          $ref: '#/components/schemas/PostContentTypeDto'
+        isPrivate:
+          type: boolean
     PostResponseDto:
-      description: The Post with all likes and comments
       type: object
       title: PostResponseDto
       properties:
         postId:
           type: string
+          format: uuid
         createdBy:
           type: string
+          format: uuid
         content:
           type: string
         timestamp: { }
         isPrivate:
           type: boolean
-        tagedUserIds:
+        taggedUserIds:
           type: array
           items:
             type: string
+            format: uuid
         comments:
           type: array
           items:
@@ -246,7 +279,7 @@ components:
         parentType:
           $ref: '#/components/schemas/ParentType'
         contentType:
-          $ref: '#/components/schemas/ContentType'
+          $ref: '#/components/schemas/CommentContentType'
       required:
         - parent
         - content
@@ -259,7 +292,7 @@ components:
         content:
           type: string
         contentType:
-          $ref: '#/components/schemas/ContentType'
+          $ref: '#/components/schemas/CommentContentType'
       required:
         - content
         - contentType
@@ -325,10 +358,18 @@ components:
       enum:
         - post
         - news
-    ContentType:
+    CommentContentType:
       title: ContentType
       type: string
       enum:
         - text
         - gif
         - image
+    PostContentTypeDto:
+      title: PostType
+      type: string
+      enum:
+        - text
+        - gif
+        - image
+        - video
