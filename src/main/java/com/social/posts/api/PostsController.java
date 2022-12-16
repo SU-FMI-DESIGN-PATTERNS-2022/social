@@ -8,6 +8,7 @@ import com.social.posts.service.PostsService;
 import com.social.users.model.SocialUser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,10 +63,10 @@ public class PostsController implements PostsApi {
   }
 
   private Post postRequestDtoToPost(PostPostDto postRequestDto) {
-    UUID createdBy = UUID.randomUUID();
+    SocialUser user = (SocialUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     return Post.builder()
         .postId(UUID.randomUUID())
-        .createdBy(new SocialUser(createdBy))
+        .createdBy(new SocialUser(user.getId()))
         .content(postRequestDto.getContent())
         .contentType(getContentType(postRequestDto))
         .isPrivate(postRequestDto.getIsPrivate())

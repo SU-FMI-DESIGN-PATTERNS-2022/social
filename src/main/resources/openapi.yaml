@@ -70,7 +70,6 @@ paths:
       responses:
         '200':
           description: Desc
-
   /posts:
     post:
         summary: 'Create a new post from the current user'
@@ -208,9 +207,6 @@ components:
       title: PostRequestDto
       type: object
       properties:
-        createdBy:
-          type: string
-          format: uuid
         content:
           type: string
         contentType:
@@ -224,7 +220,6 @@ components:
             type: string
             format: uuid
       required:
-        - createdBy
         - content
         - contentType
         - isPrivate

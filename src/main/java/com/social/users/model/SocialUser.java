@@ -1,5 +1,6 @@
 package com.social.users.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -12,7 +13,8 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "users")
+@AllArgsConstructor
+@Table(name = "social_users")
 public class SocialUser {
 
   @Id
