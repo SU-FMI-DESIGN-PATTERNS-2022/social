@@ -72,19 +72,19 @@ paths:
           description: Desc
   /posts:
     post:
-        summary: 'Create a new post from the current user'
-        tags:
-          - posts
-        operationId: post-post
-        requestBody:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostPostDto'
-          description: ''
-        responses:
-          '201':
-            description: A new post has been created
+      summary: 'Create a new post from the current user'
+      tags:
+        - posts
+      operationId: post-post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostPostDto'
+        description: ''
+      responses:
+        '201':
+          description: A new post has been created
   /posts/{postId}:
     parameters:
       - schema:
@@ -159,11 +159,32 @@ paths:
         '200':
           description: OK
   /reactions:
-    put:
-      summary: 'Adds a reaction of the given type to the specified item'
+    post:
+      summary: 'Create a new reaction'
       tags:
         - reactions
-      operationId: put-reactions
+      operationId: post-reaction
+      responses:
+        '201':
+          description: Created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReactionDto'
+  '/reactions/{reactionId}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: reactionId
+        in: path
+        required: true
+    put:
+      summary: 'Change reaction type'
+      tags:
+        - reactions
+      operationId: put-reaction
       responses:
         '200':
           description: OK
@@ -176,19 +197,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReactionDto'
-        description: ''
-  '/reactions/{reactionId}':
-    parameters:
-      - schema:
-          type: string
-        name: reactionId
-        in: path
-        required: true
     delete:
-      summary: ''
+      summary: 'Removes a reaction from the target entity'
       tags:
         - reactions
-      operationId: delete-reactions-reactionId
+      operationId: delete-reaction
       responses:
         '200':
           description: OK
@@ -215,7 +228,7 @@ components:
           type: boolean
         taggedUsers:
           type: array
-          default: []
+          default: [ ]
           items:
             type: string
             format: uuid
@@ -309,21 +322,27 @@ components:
       title: ReactionDto
       type: object
       properties:
-        userId:
-          type: string
         parentId:
           type: string
+          format: uuid
         parentType:
-          type: string
+          $ref: '#/components/schemas/ParentType'
         reactionType:
-          type: string
-          enum:
-            - like
-            - love
-            - haha
-            - wow
-            - sad
-            - angry
+          $ref: '#/components/schemas/ReactionTypeDto'
+      required:
+        - parentId
+        - parentType
+        - reactionType
+    ReactionTypeDto:
+      title: ReactionTypeDto
+      type: string
+      enum:
+        - like
+        - love
+        - haha
+        - wow
+        - sad
+        - angry
     UserDto:
       title: User
       type: object
@@ -351,8 +370,9 @@ components:
       title: ParentType
       type: string
       enum:
-        - post
         - news
+        - post
+        - comment
     CommentContentType:
       title: ContentType
       type: string

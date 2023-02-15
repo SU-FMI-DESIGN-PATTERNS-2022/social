@@ -38,4 +38,8 @@ public class PostsService {
   public void updatePost(UUID postId, UUID userId, String content, Post.ContentType contentType, Boolean isPrivate) {
     postsRepository.updateContentAndContentTypeAndIsPrivateByPostIdAnAndCreatedBy(postId, new SocialUser(userId), content, contentType, isPrivate);
   }
+
+  public boolean existsById(UUID id) {
+    return postsRepository.existsById(id);
+  }
 }
