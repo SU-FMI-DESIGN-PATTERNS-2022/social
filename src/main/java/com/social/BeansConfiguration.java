@@ -16,8 +16,8 @@ public class BeansConfiguration {
 
 
   @Bean
-  public CommentsService commentsService(CommentsRepository commentsRepository) {
-    return new CommentsService(commentsRepository);
+  public CommentsService commentsService(CommentsRepository commentsRepository, PostsRepository postsRepository, ReactionsRepository reactionsRepository) {
+    return new CommentsService(commentsRepository, postsRepository, reactionsRepository);
   }
 
 
@@ -35,4 +35,5 @@ public class BeansConfiguration {
   public SocialUsersService socialUsersService(SocialUsersRepository socialUsersRepository) {
     return new SocialUsersService(socialUsersRepository);
   }
+
 }

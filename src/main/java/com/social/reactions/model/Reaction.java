@@ -25,7 +25,7 @@ public class Reaction {
   @Column(name = "user_id")
   private UUID userId;
   @Column(name = "parent_id")
-  private UUID parentId;
+  private String parentId;
   @Column(name = "parent_type")
   private ParentType parentType;
   @Column(name = "reaction_type")

@@ -1,22 +1,25 @@
 package com.social.comments.repository;
 
 import com.social.comments.model.Comment;
-import com.social.comments.model.CommentContentType;
-import com.social.model.ParentType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface CommentsRepository extends JpaRepository<Comment, String> {
+public interface CommentsRepository extends JpaRepository<Comment, UUID> {
 
-  void deleteAllByParentAndParentType(UUID parent, ParentType parentType);
-  void deleteByIdAndUserId(String id, String userId);
+  @Query("SELECT c FROM Comment c WHERE c.pathToComment LIKE CONCAT(:originalId,'%')")
+  List<Comment> findAllByOriginalId(@Param("originalId") String originalId);
+
+  @Query("SELECT COUNT(c) FROM Comment c where c.pathToComment LIKE CONCAT('%', :originalId, '%')")
+  int countCommentChildren(String commentId);
 
   @Modifying
-  @Query("UPDATE Comment c SET c.content = ?3, c.contentType = ?4 WHERE c.id=?1 AND c.userId =?2")
-  void updateContentAndContentTypeByIdAndUserId(String id, String userId, String content, CommentContentType contentType);
+  @Query("UPDATE Comment c SET c.content = :content WHERE c.commentId = :comment_id")
+  void updateContentByCommentId(@Param("content") String content, @Param("comment_id") UUID commentId);
 }

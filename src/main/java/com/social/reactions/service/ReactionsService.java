@@ -2,6 +2,7 @@ package com.social.reactions.service;
 
 
 import com.social.comments.repository.CommentsRepository;
+import com.social.model.ParentType;
 import com.social.posts.repository.PostsRepository;
 import com.social.reactions.model.Reaction;
 import com.social.reactions.repository.ReactionsRepository;
@@ -35,21 +36,33 @@ public class ReactionsService {
     if (reactionsRepository.existsByParentIdAndUserId(reaction.getParentId(), reaction.getUserId())) {
       throw new IllegalArgumentException("Reaction for resource already exists.");
     }
-    switch (reaction.getParentType()) {
+    checkIfParentExists(reaction.getParentId(), reaction.getParentType());
+    reactionsRepository.save(reaction);
+  }
+
+  public void checkIfParentExists(String parentId, ParentType parentType) {
+    switch (parentType) {
       case POST -> {
-        if (!postsRepository.existsById(reaction.getParentId())) {
+        if (!postsRepository.existsById(getUUID(parentId))) {
           throw new IllegalArgumentException(PARENT_DOES_NOT_EXIST);
         }
       }
       case COMMENT -> {
-        if (commentsRepository.existsById(reaction.getParentId().toString())) {
+        if (commentsRepository.existsById(getUUID(parentId))) {
           throw new IllegalArgumentException(PARENT_DOES_NOT_EXIST);
         }
       }
       case NEWS -> {
       }
     }
-    reactionsRepository.save(reaction);
+  }
+
+  private UUID getUUID(String id) {
+    try {
+      return UUID.fromString(id);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("parentId not in uuid format");
+    }
   }
 
   public void deleteReaction(UUID userId, UUID reactionId) {
@@ -66,14 +79,15 @@ public class ReactionsService {
 
   public void updateReactionType(Reaction reaction) {
     SocialUser user = (SocialUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    if (!user.getId().equals(reaction.getUserId())) {
-      throw new IllegalCallerException(CAN_NOT_MODIFY_REACTION);
-    }
     Optional<Reaction> optionalReaction = reactionsRepository.findById(reaction.getReactionId());
     if (optionalReaction.isEmpty()) {
       throw new IllegalArgumentException(REACTION_NOT_FOUND_MSG);
     }
     Reaction toUpdate = optionalReaction.get();
+
+    if (!user.getId().equals(toUpdate.getUserId())) {
+      throw new IllegalCallerException(CAN_NOT_MODIFY_REACTION);
+    }
     toUpdate.setReactionType(reaction.getReactionType());
 
     reactionsRepository.save(toUpdate);
