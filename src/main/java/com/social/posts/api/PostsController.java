@@ -29,8 +29,8 @@ public class PostsController implements PostsApi {
 
   @Override
   public ResponseEntity<Void> deletePost(UUID postId) {
-    UUID userId = UUID.randomUUID();
-    postsService.deletePost(postId, userId);
+    SocialUser user = (SocialUser) SecurityContextHolder.getContext().getAuthentication();
+    postsService.deletePost(postId, user.getId());
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
@@ -43,20 +43,20 @@ public class PostsController implements PostsApi {
 
   @Override
   public ResponseEntity<Void> patchPost(UUID postId, PostPatchDto postPatchDto) {
-    UUID userId = UUID.randomUUID();
+    SocialUser user = (SocialUser) SecurityContextHolder.getContext().getAuthentication();
     if (postPatchDto.getContent() == null && postPatchDto.getIsPrivate() == null) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     if (postPatchDto.getContent() != null && postPatchDto.getContentType() != null && postPatchDto.getIsPrivate() != null) {
-      postsService.updatePost(postId, userId, postPatchDto.getContent(), getContentType(postPatchDto), postPatchDto.getIsPrivate());
+      postsService.updatePost(postId, user.getId(), postPatchDto.getContent(), getContentType(postPatchDto), postPatchDto.getIsPrivate());
       return new ResponseEntity<>(HttpStatus.OK);
     }
     if (postPatchDto.getContent() != null && postPatchDto.getContentType() != null) {
-      postsService.updatePostContent(postId, userId, postPatchDto.getContent(), getContentType(postPatchDto));
+      postsService.updatePostContent(postId, user.getId(), postPatchDto.getContent(), getContentType(postPatchDto));
       return new ResponseEntity<>(HttpStatus.OK);
     }
     if (postPatchDto.getIsPrivate() != null) {
-      postsService.updatePostIsPrivate(postId, userId, postPatchDto.getIsPrivate());
+      postsService.updatePostIsPrivate(postId, user.getId(), postPatchDto.getIsPrivate());
       return new ResponseEntity<>(HttpStatus.OK);
     }
     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

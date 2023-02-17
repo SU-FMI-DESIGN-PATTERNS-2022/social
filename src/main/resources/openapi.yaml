@@ -72,19 +72,19 @@ paths:
           description: Desc
   /posts:
     post:
-        summary: 'Create a new post from the current user'
-        tags:
-          - posts
-        operationId: post-post
-        requestBody:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostPostDto'
-          description: ''
-        responses:
-          '201':
-            description: A new post has been created
+      summary: 'Create a new post from the current user'
+      tags:
+        - posts
+      operationId: post-post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostPostDto'
+        description: ''
+      responses:
+        '201':
+          description: A new post has been created
   /posts/{postId}:
     parameters:
       - schema:
@@ -119,7 +119,7 @@ paths:
           description: OK
   /comments:
     post:
-      summary: ''
+      summary: 'Create a new comment'
       tags:
         - comments
       operationId: post-comments
@@ -135,6 +135,7 @@ paths:
     parameters:
       - schema:
           type: string
+          format: uuid
         name: commentId
         in: path
         required: true
@@ -142,6 +143,7 @@ paths:
       summary: 'Update the content of a post'
       tags:
         - comments
+      operationId: patch-comment
       responses:
         '200':
           description: OK
@@ -151,19 +153,40 @@ paths:
             schema:
               $ref: '#/components/schemas/CommentPatchDto'
     delete:
-      summary: ''
+      summary: 'If post has children unset content else delete comment'
       tags:
         - comments
-      operationId: delete-comments-commentId
+      operationId: delete-comment
       responses:
         '200':
           description: OK
   /reactions:
-    put:
-      summary: 'Adds a reaction of the given type to the specified item'
+    post:
+      summary: 'Create a new reaction'
       tags:
         - reactions
-      operationId: put-reactions
+      operationId: post-reaction
+      responses:
+        '201':
+          description: Created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReactionDto'
+  '/reactions/{reactionId}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: reactionId
+        in: path
+        required: true
+    put:
+      summary: 'Change reaction type'
+      tags:
+        - reactions
+      operationId: put-reaction
       responses:
         '200':
           description: OK
@@ -176,19 +199,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReactionDto'
-        description: ''
-  '/reactions/{reactionId}':
-    parameters:
-      - schema:
-          type: string
-        name: reactionId
-        in: path
-        required: true
     delete:
-      summary: ''
+      summary: 'Removes a reaction from the target entity'
       tags:
         - reactions
-      operationId: delete-reactions-reactionId
+      operationId: delete-reaction
       responses:
         '200':
           description: OK
@@ -215,7 +230,7 @@ components:
           type: boolean
         taggedUsers:
           type: array
-          default: []
+          default: [ ]
           items:
             type: string
             format: uuid
@@ -245,9 +260,11 @@ components:
           format: uuid
         content:
           type: string
-        timestamp: { }
-        isPrivate:
-          type: boolean
+        contentType:
+          $ref: '#/components/schemas/PostContentTypeDto'
+        timestamp:
+          type: string
+          format: date
         taggedUserIds:
           type: array
           items:
@@ -260,25 +277,24 @@ components:
         reactions:
           type: array
           items:
-            $ref: '#/components/schemas/ReactionDto'
+            $ref: '#/components/schemas/ReactionResponseDto'
     CommentPostDto:
       title: CommentPostDto
       type: object
       properties:
-        parentComment:
-          type: string
-        content:
-          type: string
-        parent:
+        parentId:
           type: string
         parentType:
           $ref: '#/components/schemas/ParentType'
+        content:
+          type: string
+          format: byte
         contentType:
           $ref: '#/components/schemas/CommentContentType'
       required:
-        - parent
-        - content
+        - parentId
         - parentType
+        - content
         - contentType
     CommentPatchDto:
       title: CommentPatchDto
@@ -286,6 +302,7 @@ components:
       properties:
         content:
           type: string
+          format: byte
         contentType:
           $ref: '#/components/schemas/CommentContentType'
       required:
@@ -301,29 +318,44 @@ components:
           type: string
         content:
           type: string
+        contentType:
+          $ref: '#/components/schemas/CommentContentType'
         reactions:
           type: array
           items:
-            $ref: '#/components/schemas/ReactionDto'
+            $ref: '#/components/schemas/ReactionResponseDto'
     ReactionDto:
       title: ReactionDto
       type: object
       properties:
-        userId:
-          type: string
         parentId:
           type: string
         parentType:
+          $ref: '#/components/schemas/ParentType'
+        reactionType:
+          $ref: '#/components/schemas/ReactionTypeDto'
+      required:
+        - parentId
+        - parentType
+        - reactionType
+    ReactionTypeDto:
+      title: ReactionTypeDto
+      type: string
+      enum:
+        - like
+        - love
+        - haha
+        - wow
+        - sad
+        - angry
+    ReactionResponseDto:
+      title: ReactionResponseDto
+      type: object
+      properties:
+        userId:
           type: string
         reactionType:
-          type: string
-          enum:
-            - like
-            - love
-            - haha
-            - wow
-            - sad
-            - angry
+          $ref: '#/components/schemas/ReactionTypeDto'
     UserDto:
       title: User
       type: object
@@ -351,8 +383,9 @@ components:
       title: ParentType
       type: string
       enum:
-        - post
         - news
+        - post
+        - comment
     CommentContentType:
       title: ContentType
       type: string

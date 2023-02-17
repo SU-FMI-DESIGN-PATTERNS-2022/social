@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/")
 public class FeedController implements FeedApi {
 
-  @PostMapping("/feed")
+  @Override
   public ResponseEntity<FeedDto> feedGet() {
     return null;
   }
