@@ -260,9 +260,11 @@ components:
           format: uuid
         content:
           type: string
-        timestamp: { }
-        isPrivate:
-          type: boolean
+        contentType:
+          $ref: '#/components/schemas/PostContentTypeDto'
+        timestamp:
+          type: string
+          format: date
         taggedUserIds:
           type: array
           items:
@@ -275,7 +277,7 @@ components:
         reactions:
           type: array
           items:
-            $ref: '#/components/schemas/ReactionDto'
+            $ref: '#/components/schemas/ReactionResponseDto'
     CommentPostDto:
       title: CommentPostDto
       type: object
@@ -321,7 +323,7 @@ components:
         reactions:
           type: array
           items:
-            $ref: '#/components/schemas/ReactionDto'
+            $ref: '#/components/schemas/ReactionResponseDto'
     ReactionDto:
       title: ReactionDto
       type: object
@@ -346,6 +348,14 @@ components:
         - wow
         - sad
         - angry
+    ReactionResponseDto:
+      title: ReactionResponseDto
+      type: object
+      properties:
+        userId:
+          type: string
+        reactionType:
+          $ref: '#/components/schemas/ReactionTypeDto'
     UserDto:
       title: User
       type: object

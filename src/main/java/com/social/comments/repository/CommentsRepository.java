@@ -16,6 +16,9 @@ public interface CommentsRepository extends JpaRepository<Comment, UUID> {
   @Query("SELECT c FROM Comment c WHERE c.pathToComment LIKE CONCAT(:originalId,'%')")
   List<Comment> findAllByOriginalId(@Param("originalId") String originalId);
 
+  @Query("SELECT c FROM Comment c WHERE c.pathToComment LIKE CONCAT(:originalId,'%')")
+  List<Comment> findAllByOriginalIds(@Param("originalId") List<String> originalId);
+
   @Query("SELECT COUNT(c) FROM Comment c where c.pathToComment LIKE CONCAT('%', :originalId, '%')")
   int countCommentChildren(String commentId);
 

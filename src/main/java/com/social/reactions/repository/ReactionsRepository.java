@@ -13,4 +13,6 @@ public interface ReactionsRepository extends JpaRepository<Reaction, UUID> {
   boolean existsByParentIdAndUserId(String parentId,UUID userId);
 
   void deleteAllByParentIdIn(List<String> parentIds);
+
+  List<Reaction> findAllByParentIdIn(List<String> ids);
 }
